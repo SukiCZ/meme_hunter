@@ -1,0 +1,28 @@
+{% extends "home/base.html" %}
+
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+
+    {% for meme in memes %}
+        {% if forloop.counter0|divisibleby:3 %}
+            <div class="row">
+        {% endif %}
+
+    <div class="col-md-4">
+        <div class="thumbnail">
+            <a href="{% url "meme_detail" meme.id %}">
+                <img src="{{ meme.url }}" alt="{{ meme.title }}" style="width:100%">
+                <div class="caption">
+                    <p>{{ meme.title }}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    {% if forloop.counter|divisibleby:3 %}
+        </div>
+    {% endif %}
+    {% endfor %}
+{% endblock content %}

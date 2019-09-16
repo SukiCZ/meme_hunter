@@ -1,0 +1,32 @@
+contract ExampleContract =
+  record meme =
+    { authorAddress : address, name : string, url : string, cost : int }
+
+  record state =
+    { memes : map(int, meme), memesLength : int }
+
+  entrypoint init() : state =
+    { memes = {}, memesLength = 0 }
+
+  entrypoint getMemesLength() : int =
+    state.memesLength
+
+  entrypoint getMeme(index : int) : meme =
+    switch(Map.lookup(index, state.memes))
+      None    => abort("There was no meme with this index registered.")
+      Some(x) => x
+
+  stateful entrypoint registerMeme(nameparam : string, urlparam : string, costparam : int) =
+    let meme = { authorAddress = Call.caller, name = nameparam, url = urlparam, cost = costparam}
+    let index = getMemesLength() + 1
+    put(state{ memes[index] = meme, memesLength = index })
+
+  stateful entrypoint buyMeme() : () =
+    if(Call.value >= 10000000000000000000)
+      let tax = 10  
+      let fund = Call.value * tax / 100
+      let send = Call.value * (100 - tax)
+      Chain.spend(ak_fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk, fund)
+      Chain.spend(ak_2MKKhjfk5nmrLB4PJU4THPFRUeDi71UMvmNePEJXXXPC6mJYmV, send)
+    else
+      Chain.spend(ak_2MKKhjfk5nmrLB4PJU4THPFRUeDi71UMvmNePEJXXXPC6mJYmV, Call.value)
